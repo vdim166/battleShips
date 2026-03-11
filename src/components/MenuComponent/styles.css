@@ -1,0 +1,12 @@
+.menu-component {
+  height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-game-button:hover {
+  cursor: pointer;
+}

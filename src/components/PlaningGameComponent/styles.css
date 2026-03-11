@@ -1,0 +1,70 @@
+.planing-game-container {
+  display: flex;
+
+  height: 100vh;
+  width: 100%;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 50px;
+}
+
+.planing-game-grid {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.cell {
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+}
+
+.isHovering {
+  background-color: red;
+}
+
+.planing-game-row {
+  display: flex;
+}
+
+.planing-ships {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.ship {
+  display: flex;
+}
+
+.ship-planing-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.ship-counter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shipOne {
+  background-color: green;
+}
+
+.shipTwo {
+  background-color: blue;
+}
+
+.shipThree {
+  background-color: brown;
+}
+
+.shipFour {
+  background-color: aqua;
+}
