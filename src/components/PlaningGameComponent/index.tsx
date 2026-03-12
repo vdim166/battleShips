@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./styles.css";
+import { useGameContext } from "../../hooks/useGameContext";
+import { IN_GAME_STATES } from "../../context/GameContext";
+import { checkIfShipCanBePlaced } from "../../utils/checkIfShipCanBePlaced";
+import { generateRandomShips } from "../../utils/generateRandomShips";
+import { SHIP_TYPES } from "../types/SHIP_TYPES";
+import { ROTATION_STATES } from "../types/ROTATION_STATES";
 
-export const SHIP_TYPES = {
-  ONE: "ONE",
-  TWO: "TWO",
-  THREE: "THREE",
-  FOUR: "FOUR",
-} as const;
+export type cellShipType = {
+  shipType: keyof typeof SHIP_TYPES;
+  rotation: keyof typeof ROTATION_STATES;
+  parts: [number, number][];
+};
 
 export const PlaningGameComponent = () => {
   const [isGrabbing, setIsGrabbing] = useState<keyof typeof SHIP_TYPES | null>(
     null,
   );
 
-  const [cells, setCells] = useState<(null | keyof typeof SHIP_TYPES)[][]>([
+  const { setInGameState, setGameCells } = useGameContext();
+
+  const [cells, setCells] = useState<(null | cellShipType)[][]>([
     [null, null, null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null, null, null],
     [null, null, null, null, null, null, null, null, null, null],
@@ -26,7 +33,20 @@ export const PlaningGameComponent = () => {
     [null, null, null, null, null, null, null, null, null, null],
   ]);
 
+  const dragGhostRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+    dragGhostRef.current = img;
+  }, []);
+
   const [isHoveringOn, setIsHoveringOn] = useState<null | string[]>(null);
+
+  const [rotation, setRotation] = useState<keyof typeof ROTATION_STATES>(
+    ROTATION_STATES.HORIZONTAL,
+  );
 
   const [shipCounter, setShipCounter] = useState({
     [SHIP_TYPES.ONE]: 4,
@@ -35,129 +55,68 @@ export const PlaningGameComponent = () => {
     [SHIP_TYPES.FOUR]: 1,
   });
 
-  const checkIfShipCanBePlaced = (
-    rowIndex: number,
-    cellIndex: number,
-    shipType: keyof typeof SHIP_TYPES,
-  ) => {
-    if (shipType === SHIP_TYPES.ONE) {
-      if (cells[rowIndex][cellIndex] === null) {
-        if (cells?.[rowIndex + 1]?.[cellIndex]) return null;
-        if (cells?.[rowIndex]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex + 1]) return null;
-
-        if (cells?.[rowIndex - 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex]) return null;
-
-        return [[rowIndex, cellIndex]];
-      }
-
-      return null;
+  const changeRotationHandle = () => {
+    if (rotation === ROTATION_STATES.HORIZONTAL) {
+      setRotation(ROTATION_STATES.VERTICAL);
     }
-
-    if (shipType === SHIP_TYPES.TWO) {
-      if (cells[rowIndex][cellIndex] === null) {
-        if (cells?.[rowIndex + 1]?.[cellIndex]) return null;
-        if (cells?.[rowIndex]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex + 1]) return null;
-
-        if (cells?.[rowIndex - 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex]) return null;
-
-        if (cellIndex - 1 >= 0 && cells[rowIndex][cellIndex - 1] === null) {
-          if (cells?.[rowIndex]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex + 1]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex - 1]?.[cellIndex - 2]) return null;
-
-          return [
-            [rowIndex, cellIndex],
-            [rowIndex, cellIndex - 1],
-          ];
-        }
-      }
-
-      return null;
+    if (rotation === ROTATION_STATES.VERTICAL) {
+      setRotation(ROTATION_STATES.HORIZONTAL);
     }
+  };
 
-    if (shipType === SHIP_TYPES.THREE) {
-      if (cells[rowIndex][cellIndex] === null) {
-        if (cells?.[rowIndex + 1]?.[cellIndex]) return null;
-        if (cells?.[rowIndex]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex + 1]) return null;
-
-        if (cells?.[rowIndex - 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex]) return null;
-        if (cellIndex - 1 >= 0 && cells[rowIndex][cellIndex - 1] === null) {
-          if (cells?.[rowIndex]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex + 1]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex - 1]?.[cellIndex - 2]) return null;
-          if (cellIndex - 2 >= 0 && cells[rowIndex][cellIndex - 2] === null) {
-            if (cells?.[rowIndex]?.[cellIndex - 3]) return null;
-            if (cells?.[rowIndex + 1]?.[cellIndex - 3]) return null;
-            if (cells?.[rowIndex - 1]?.[cellIndex - 3]) return null;
-            return [
-              [rowIndex, cellIndex],
-              [rowIndex, cellIndex - 1],
-              [rowIndex, cellIndex - 2],
-            ];
-          }
-        }
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 2) {
+        e.preventDefault();
+        e.stopPropagation();
+        changeRotationHandle();
       }
+    };
 
-      return null;
-    }
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
 
-    if (shipType === SHIP_TYPES.FOUR) {
-      if (cells[rowIndex][cellIndex] === null) {
-        if (cells?.[rowIndex + 1]?.[cellIndex]) return null;
-        if (cells?.[rowIndex]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex + 1]?.[cellIndex + 1]) return null;
+    document.addEventListener("mousedown", handleMouseDown, { capture: true });
+    document.addEventListener("contextmenu", handleContextMenu, {
+      capture: true,
+    });
 
-        if (cells?.[rowIndex - 1]?.[cellIndex - 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex + 1]) return null;
-        if (cells?.[rowIndex - 1]?.[cellIndex]) return null;
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown, {
+        capture: true,
+      });
+      document.removeEventListener("contextmenu", handleContextMenu, {
+        capture: true,
+      });
+    };
+  }, [rotation]);
 
-        if (cellIndex - 1 >= 0 && cells[rowIndex][cellIndex - 1] === null) {
-          if (cells?.[rowIndex]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex + 1]?.[cellIndex - 2]) return null;
-          if (cells?.[rowIndex - 1]?.[cellIndex - 2]) return null;
+  const isAllShipPlaced = () => {
+    return Object.keys(shipCounter).every((key) => {
+      if (shipCounter[key as keyof typeof SHIP_TYPES] === 0) return true;
 
-          if (cellIndex - 2 >= 0 && cells[rowIndex][cellIndex - 2] === null) {
-            if (cells?.[rowIndex]?.[cellIndex - 3]) return null;
-            if (cells?.[rowIndex + 1]?.[cellIndex - 3]) return null;
-            if (cells?.[rowIndex - 1]?.[cellIndex - 3]) return null;
+      return false;
+    });
+  };
 
-            if (cellIndex - 3 >= 0 && cells[rowIndex][cellIndex - 3] === null) {
-              if (cells?.[rowIndex]?.[cellIndex - 4]) return null;
-              if (cells?.[rowIndex + 1]?.[cellIndex - 4]) return null;
-              if (cells?.[rowIndex - 1]?.[cellIndex - 4]) return null;
+  const startGameHandle = () => {
+    setGameCells(cells);
+    setInGameState(IN_GAME_STATES.PLAYING);
+  };
 
-              return [
-                [rowIndex, cellIndex],
-                [rowIndex, cellIndex - 1],
-                [rowIndex, cellIndex - 2],
-                [rowIndex, cellIndex - 3],
-              ];
-            }
-          }
-        }
-      }
+  const randomHandle = () => {
+    const ships = generateRandomShips();
 
-      return null;
-    }
+    setCells(ships);
 
-    return null;
+    setShipCounter({
+      FOUR: 0,
+      ONE: 0,
+      THREE: 0,
+      TWO: 0,
+    });
   };
 
   return (
@@ -171,8 +130,9 @@ export const PlaningGameComponent = () => {
 
                 return (
                   <div
+                    draggable={cells[rowIndex][cellIndex] !== null}
                     key={`cell-${rowId}`}
-                    className={`cell ${isHoveringOn?.includes(rowId) ? "isHovering" : ""} ${rowValue === SHIP_TYPES.ONE ? "shipOne" : ""} ${rowValue === SHIP_TYPES.TWO ? "shipTwo" : ""} ${rowValue === SHIP_TYPES.THREE ? "shipThree" : ""} ${rowValue === SHIP_TYPES.FOUR ? "shipFour" : ""}`}
+                    className={`cell ${isHoveringOn?.includes(rowId) ? "isHovering" : ""} ${rowValue?.shipType === SHIP_TYPES.ONE ? "shipOne" : ""} ${rowValue?.shipType === SHIP_TYPES.TWO ? "shipTwo" : ""} ${rowValue?.shipType === SHIP_TYPES.THREE ? "shipThree" : ""} ${rowValue?.shipType === SHIP_TYPES.FOUR ? "shipFour" : ""}`}
                     onDragEnter={() => {
                       if (!isGrabbing) return;
 
@@ -180,6 +140,8 @@ export const PlaningGameComponent = () => {
                         rowIndex,
                         cellIndex,
                         isGrabbing,
+                        rotation,
+                        cells,
                       );
 
                       if (status === null) return;
@@ -187,6 +149,32 @@ export const PlaningGameComponent = () => {
                       setIsHoveringOn(
                         status.map((cells) => `${cells[0]}-${cells[1]}`),
                       );
+                    }}
+                    onDragStart={(e) => {
+                      if (dragGhostRef.current) {
+                        e.dataTransfer.setDragImage(dragGhostRef.current, 0, 0);
+                      }
+
+                      if (cells[rowIndex][cellIndex] === null) return;
+
+                      setIsGrabbing(cells[rowIndex][cellIndex].shipType);
+                      const newState = [...cells];
+
+                      const shipCounterCopy = { ...shipCounter };
+
+                      shipCounterCopy[cells[rowIndex][cellIndex].shipType] += 1;
+
+                      setShipCounter(shipCounterCopy);
+
+                      cells[rowIndex][cellIndex].parts.forEach(([row, col]) => {
+                        newState[row][col] = null;
+                      });
+
+                      setCells(newState);
+                    }}
+                    onDragEnd={() => {
+                      setIsGrabbing(null);
+                      setIsHoveringOn(null);
                     }}
                     onDragOver={(e) => {
                       e.preventDefault();
@@ -202,6 +190,8 @@ export const PlaningGameComponent = () => {
                         rowIndex,
                         cellIndex,
                         isGrabbing,
+                        rotation,
+                        cells,
                       );
 
                       if (status === null) return;
@@ -209,7 +199,11 @@ export const PlaningGameComponent = () => {
                       const newState = [...cells];
 
                       for (const [rowIndex, cellIndex] of status) {
-                        newState[rowIndex][cellIndex] = isGrabbing;
+                        newState[rowIndex][cellIndex] = {
+                          shipType: isGrabbing,
+                          rotation,
+                          parts: status,
+                        };
                       }
 
                       setCells(newState);
@@ -229,13 +223,18 @@ export const PlaningGameComponent = () => {
       </div>
 
       <div className="planing-ships">
-        <div>Rotation : </div>
+        <div className="planing-rotation-container">
+          Rotation : <p onClick={changeRotationHandle}>{rotation}</p>
+        </div>
 
         <div className="ship-planing-container">
           <div
             className="ship"
             draggable
-            onDragStart={() => {
+            onDragStart={(e) => {
+              if (dragGhostRef.current) {
+                e.dataTransfer.setDragImage(dragGhostRef.current, 0, 0);
+              }
               setIsGrabbing(SHIP_TYPES.FOUR);
             }}
             onDragEnd={() => {
@@ -255,7 +254,10 @@ export const PlaningGameComponent = () => {
           <div
             className="ship"
             draggable
-            onDragStart={() => {
+            onDragStart={(e) => {
+              if (dragGhostRef.current) {
+                e.dataTransfer.setDragImage(dragGhostRef.current, 0, 0);
+              }
               setIsGrabbing(SHIP_TYPES.THREE);
             }}
             onDragEnd={() => {
@@ -273,7 +275,10 @@ export const PlaningGameComponent = () => {
           <div
             className="ship"
             draggable
-            onDragStart={() => {
+            onDragStart={(e) => {
+              if (dragGhostRef.current) {
+                e.dataTransfer.setDragImage(dragGhostRef.current, 0, 0);
+              }
               setIsGrabbing(SHIP_TYPES.TWO);
             }}
             onDragEnd={() => {
@@ -290,7 +295,10 @@ export const PlaningGameComponent = () => {
           <div
             className="ship"
             draggable
-            onDragStart={() => {
+            onDragStart={(e) => {
+              if (dragGhostRef.current) {
+                e.dataTransfer.setDragImage(dragGhostRef.current, 0, 0);
+              }
               setIsGrabbing(SHIP_TYPES.ONE);
             }}
             onDragEnd={() => {
@@ -303,8 +311,15 @@ export const PlaningGameComponent = () => {
           <div className="ship-counter">- {shipCounter[SHIP_TYPES.ONE]}</div>
         </div>
 
-        <div>
-          <button>Start</button>
+        <div className="planning-end-button-container">
+          <button onClick={randomHandle}>Random</button>
+          <button
+            className="planning-end-button"
+            disabled={!isAllShipPlaced()}
+            onClick={startGameHandle}
+          >
+            Start
+          </button>
         </div>
       </div>
     </div>

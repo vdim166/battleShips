@@ -1,0 +1,53 @@
+.game-component {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.game-container {
+  display: flex;
+
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+
+  gap: 50px;
+}
+
+.turn-container {
+  margin-bottom: 50px;
+}
+
+.playing-cell {
+  cursor: pointer;
+}
+.destroyed-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.destroyed-cross svg path {
+  fill: red;
+}
+
+.dead-cross svg path {
+  fill: black;
+}
+
+.game-end-container {
+  position: absolute;
+
+  background-color: white;
+
+  padding: 50px;
+  border: 1px solid black;
+  border-radius: 10px;
+}

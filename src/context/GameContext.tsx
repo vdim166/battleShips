@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { cellShipType } from "../components/PlaningGameComponent";
 
 export const GAME_STATES = { MENU: "MENU", GAME: "GAME" } as const;
 
@@ -16,6 +17,11 @@ export type GameContextType = {
   setInGameState: React.Dispatch<
     React.SetStateAction<keyof typeof IN_GAME_STATES>
   >;
+
+  gameCells: (null | cellShipType)[][] | null;
+  setGameCells: React.Dispatch<
+    React.SetStateAction<(null | cellShipType)[][] | null>
+  >;
 };
 
 const init: GameContextType = {
@@ -24,6 +30,9 @@ const init: GameContextType = {
 
   inGameState: IN_GAME_STATES.PLANING,
   setInGameState: () => {},
+
+  gameCells: null,
+  setGameCells: () => {},
 };
 
 export const GameContext = createContext<GameContextType>(init);

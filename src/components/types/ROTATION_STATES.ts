@@ -1,0 +1,4 @@
+export const ROTATION_STATES = {
+  VERTICAL: "VERTICAL",
+  HORIZONTAL: "HORIZONTAL",
+} as const;

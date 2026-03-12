@@ -5,6 +5,7 @@ import {
   IN_GAME_STATES,
   type GameContextType,
 } from "./GameContext";
+import type { cellShipType } from "../components/PlaningGameComponent";
 
 type GameContextProviderProps = {
   children: React.ReactNode;
@@ -19,11 +20,17 @@ export const GameContextProvider = ({ children }: GameContextProviderProps) => {
     IN_GAME_STATES.PLANING,
   );
 
+  const [gameCells, setGameCells] = useState<(null | cellShipType)[][] | null>(
+    null,
+  );
+
   const value: GameContextType = {
     gameState,
     setGameState,
     inGameState,
     setInGameState,
+    gameCells,
+    setGameCells,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

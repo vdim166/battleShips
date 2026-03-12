@@ -20,6 +20,9 @@
   width: 30px;
   height: 30px;
   border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .isHovering {
@@ -67,4 +70,38 @@
 
 .shipFour {
   background-color: aqua;
+}
+
+.planing-rotation-container {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  width: 180px;
+}
+
+.planing-rotation-container p {
+  color: red;
+  cursor: pointer;
+}
+
+.planning-end-button-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+
+  margin-top: 10px;
+
+  gap: 10px;
+}
+
+.planning-end-button {
+  cursor: pointer;
+
+  width: 100px;
+  height: 20px;
 }
