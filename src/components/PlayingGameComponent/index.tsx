@@ -396,7 +396,7 @@ export const PlayingGameComponent = () => {
                     return (
                       <div
                         key={`cell-${rowId}`}
-                        className={`cell playing-cell ${rowValue?.shipType === SHIP_TYPES.ONE ? "shipOne" : ""} ${rowValue?.shipType === SHIP_TYPES.TWO ? "shipTwo" : ""} ${rowValue?.shipType === SHIP_TYPES.THREE ? "shipThree" : ""} ${rowValue?.shipType === SHIP_TYPES.FOUR ? "shipFour" : ""}`}
+                        className={`cell playing-cell`}
                         onMouseEnter={() => {
                           setIsHovering(rowId);
                         }}
